@@ -1,11 +1,13 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-    const token = req.header("Authorization");
+    const authHeader = req.header("Authorization");
 
-    if (!token) {
+    if (!authHeader) {
         return res.status(401).json({ message: "Acceso denegado, token no proporcionado" });
     }
+
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -15,6 +17,7 @@ export const verifyToken = (req, res, next) => {
         return res.status(403).json({ message: "Token inválido o expirado" });
     }
 };
+
 
 export const isAdmin = (req, res, next) => {
     if (req.user && req.user.role === "Administrador") {

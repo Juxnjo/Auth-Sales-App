@@ -11,7 +11,7 @@ const Navbar = () => {
       <div className="flex gap-4">
         {user?.role === "Administrador" && <Link to="/users">Usuarios</Link>}
         <Link to="/sell">Radicar Venta</Link>
-        <Link to="/sales">Radicar Venta</Link>
+        <Link to="/sales">Ventas</Link>
         <button onClick={logout} className="bg-red-400 px-3 py-1 rounded">
           Cerrar Sesión
         </button>
