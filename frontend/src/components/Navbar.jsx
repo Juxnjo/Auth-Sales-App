@@ -6,13 +6,21 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
 
   return (
-    <nav className="bg-blue-500 p-4 text-white flex justify-between">
-      <h1 className="text-lg font-bold">{user ? `Rol: ${user.role}` : "Cargando..."}</h1>
-      <div className="flex gap-4">
-        {user?.role === "Administrador" && <Link to="/users">Usuarios</Link>}
-        <Link to="/sell">Radicar Venta</Link>
-        <Link to="/sales">Ventas</Link>
-        <button onClick={logout} className="bg-red-400 px-3 py-1 rounded">
+    <nav className="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
+      <h1 className="text-xl font-semibold">
+        {user ? `🔹 Rol: ${user.role}` : "Cargando..."}
+      </h1>
+
+      <div className="flex gap-6 text-lg">
+        {user?.role === "Administrador" && (
+          <Link to="/users" className="hover:text-gray-300 transition">Usuarios</Link>
+        )}
+        <Link to="/sell" className="hover:text-gray-300 transition">Radicar Venta</Link>
+        <Link to="/sales" className="hover:text-gray-300 transition">Ventas</Link>
+        <button 
+          onClick={logout} 
+          className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition"
+        >
           Cerrar Sesión
         </button>
       </div>

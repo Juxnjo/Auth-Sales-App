@@ -56,10 +56,13 @@ const Users = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+     <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">👥 Gestión de Usuarios</h1>
 
+      {/* Formulario para agregar o editar usuarios */}
       <UserForm onSubmit={handleSubmit} editingUser={editingUser} cancelEdit={() => setEditingUser(null)} />
+
+      {/* Lista de usuarios */}
       <UserList users={users} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );

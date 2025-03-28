@@ -140,19 +140,19 @@ const Sales = () => {
                     onClick={() => handleView(sale)}
                     className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded"
                   >
-                    👁️ Ver
+                    👁️
                   </button>
                   <button
                     onClick={() => handleEdit(sale)}
                     className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded"
                   >
-                    ✏️ Editar
+                    ✏️
                   </button>
                   <button
                     onClick={() => handleDelete(sale.id)}
                     className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded"
                   >
-                    🗑️ Eliminar
+                    🗑️
                   </button>
                 </td>
               </tr>

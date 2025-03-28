@@ -27,49 +27,80 @@ const UserForm = ({ onSubmit, editingUser, cancelEdit }) => {
   };
 
   return (
-    <div className="p-4 border mb-4">
-      <h2 className="text-xl font-bold mb-2">{editingUser ? "Editar Usuario" : "Crear Usuario"}</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nombre"
-          value={formData.nombre}
-          onChange={handleChange}
-          placeholder="Nombre"
-          required
-          className="border p-2 mr-2"
-        />
-        <input
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Correo"
-          required
-          className="border p-2 mr-2"
-        />
-        {!editingUser && (
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        {editingUser ? "✏️ Editar Usuario" : "➕ Crear Usuario"}
+      </h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <label className="block text-gray-700 font-semibold">Nombre</label>
           <input
-            name="password"
-            type="password"
-            value={formData.password}
+            name="nombre"
+            value={formData.nombre}
             onChange={handleChange}
-            placeholder="Contraseña"
+            placeholder="Nombre"
             required
-            className="border p-2 mr-2"
+            className="w-full border p-2 rounded-lg"
           />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-semibold">Correo Electrónico</label>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Correo"
+            required
+            className="w-full border p-2 rounded-lg"
+          />
+        </div>
+
+        {!editingUser && (
+          <div>
+            <label className="block text-gray-700 font-semibold">Contraseña</label>
+            <input
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Contraseña"
+              required
+              className="w-full border p-2 rounded-lg"
+            />
+          </div>
         )}
-        <select name="rol_id" value={formData.rol_id} onChange={handleChange} className="border p-2 mr-2">
-          <option value={1}>Administrador</option>
-          <option value={2}>Asesor</option>
-        </select>
-        <button type="submit" className="bg-green-500 text-white p-2">
-          {editingUser ? "Guardar" : "Agregar"}
-        </button>
-        {editingUser && (
-          <button onClick={cancelEdit} className="bg-gray-500 text-white p-2 ml-2">
-            Cancelar
+
+        <div>
+          <label className="block text-gray-700 font-semibold">Rol</label>
+          <select
+            name="rol_id"
+            value={formData.rol_id}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
+          >
+            <option value={1}>Administrador</option>
+            <option value={2}>Asesor</option>
+          </select>
+        </div>
+
+        <div className="col-span-1 md:col-span-2 flex justify-end space-x-2">
+          <button
+            type="submit"
+            className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+          >
+            {editingUser ? "💾 Guardar" : "➕ Agregar"}
           </button>
-        )}
+          {editingUser && (
+            <button
+              onClick={cancelEdit}
+              className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
+            >
+              ❌ Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
