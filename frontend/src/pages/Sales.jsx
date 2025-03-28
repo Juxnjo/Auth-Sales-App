@@ -16,7 +16,7 @@ const Sales = () => {
     producto: "",
     cupo_solicitado: "",
     franquicia: "",
-    tasa: "",
+    tasa: "", // Tasa agregada al estado del formulario
   });
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const Sales = () => {
       producto: sale.producto,
       cupo_solicitado: sale.cupo_solicitado,
       franquicia: sale.franquicia || "",
-      tasa: sale.tasa || "",
+      tasa: sale.tasa || "", // Asegúrate de pasar la tasa si existe
     });
   };
 
@@ -83,19 +83,32 @@ const Sales = () => {
   };
 
   const handleUpdate = async () => {
+    // Validación de tasa si el producto es "Credito de Consumo" o "Libranza Libre Inversión"
+    if (
+      (formData.producto === "Credito de Consumo" || formData.producto === "Libranza Libre Inversión") &&
+      !/^\d{2}(\.\d{2})?$/.test(formData.tasa)
+    ) {
+      alert("La tasa debe ser en formato XX.XX (2 números y 2 decimales)");
+      return;
+    }
+  
+    // Si el producto es "Tarjeta de Crédito", asignamos un valor predeterminado para tasa
+    const updatedData = { ...formData };
+    if (updatedData.producto === "Tarjeta de Crédito") {
+      updatedData.tasa = 0; // Usamos 0 como valor predeterminado
+    }
+  
     try {
-      await axios.put(`${API_URL}/sales/${selectedSale.id}`, formData, {
+      await axios.put(`${API_URL}/sales/${selectedSale.id}`, updatedData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchSales();
       setSelectedSale(null);
     } catch (error) {
-      console.error(
-        "Error al actualizar venta",
-        error.response?.data || error.message
-      );
+      console.error("Error al actualizar venta", error.response?.data || error.message);
     }
   };
+  
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -123,9 +136,7 @@ const Sales = () => {
             {sales.map((sale, index) => (
               <tr
                 key={sale.id}
-                className={`border-b ${
-                  index % 2 === 0 ? "bg-gray-100" : "bg-white"
-                }`}
+                className={`border-b ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
               >
                 <td className="p-3">{sale.producto}</td>
                 <td className="p-3 font-semibold text-green-600">
@@ -199,17 +210,21 @@ const Sales = () => {
                   <option value="VISA">VISA</option>
                   <option value="MASTERCARD">MASTERCARD</option>
                   <option value="AMEX">AMEX</option>
-
                 </select>
 
-                <input
-                  type="text"
-                  name="tasa"
-                  value={formData.tasa}
-                  onChange={handleChange}
-                  placeholder="Tasa"
-                  className="w-full p-2 my-2 border rounded"
-                />
+                {/* Mostrar el campo tasa solo si el producto es Crédito de Consumo o Libranza Libre Inversión */}
+                {(formData.producto === "Credito de Consumo" || formData.producto === "Libranza Libre Inversión") && (
+                  <input
+                    type="text"
+                    name="tasa"
+                    value={formData.tasa}
+                    onChange={handleChange}
+                    placeholder="Tasa (Ej: 10.58)"
+                    className="w-full p-2 my-2 border rounded"
+                    pattern="^\d{2}(\.\d{2})?$"
+                    required
+                  />
+                )}
 
                 <button
                   onClick={handleUpdate}
