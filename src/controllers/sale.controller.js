@@ -27,24 +27,20 @@ export const getSales = async (req, res) => {
 export const createSale = async (req, res) => {
   try {
     const { producto, cupo_solicitado, franquicia, tasa } = req.body;
-    const { id: usuario_creacion } = req.user; // Obtenemos el id del usuario desde req.user
+    const { id: usuario_creacion } = req.user; 
 
-    // Validaciones de datos requeridos
     if (!producto || !cupo_solicitado) {
       return res
         .status(400)
         .json({ message: "Producto y cupo solicitado son obligatorios." });
     }
 
-    // Validar franquicia solo si el producto es 'Tarjeta de Crédito'
     if (producto === "Tarjeta de Credito" && !franquicia) {
       return res.status(400).json({
         message: "La franquicia es obligatoria para tarjeta de crédito.",
       });
     }
 
-    // Validar tasa solo si el producto es 'Credito de Consumo' o 'Libranza Libre Inversión'
-    // Si el producto es "Tarjeta de Crédito", la tasa se asigna por defecto a 0
     let tasaFinal = tasa;
     if (
       producto === "Credito de Consumo" ||
@@ -56,11 +52,11 @@ export const createSale = async (req, res) => {
           .json({ message: "La tasa es obligatoria para estos productos." });
       }
     } else if (producto === "Tarjeta de Credito") {
-      // Asignar un valor predeterminado si es "Tarjeta de Crédito"
-      tasaFinal = 0; // Asignamos 0 como valor predeterminado para tasa
+      
+      tasaFinal = 0; 
     }
 
-    // Insertar la nueva venta en la base de datos, incluyendo el usuario_creacion desde req.user
+  
     const result = await pool.query(
       `
         INSERT INTO ventas (producto, cupo_solicitado, franquicia, tasa, usuario_creacion) 
@@ -71,7 +67,7 @@ export const createSale = async (req, res) => {
         cupo_solicitado,
         franquicia || null,
         tasaFinal,
-        usuario_creacion, // Usamos el id del usuario autenticado
+        usuario_creacion, 
       ]
     );
 
@@ -93,7 +89,6 @@ export const updateSale = async (req, res) => {
       usuario_actualizacion,
     } = req.body;
 
-    // Validar tasa solo si el producto es 'Credito de Consumo' o 'Libranza Libre Inversión'
     let tasaFinal = tasa;
     if (
       producto === "Credito de Consumo" ||
@@ -105,8 +100,8 @@ export const updateSale = async (req, res) => {
           .json({ message: "La tasa es obligatoria para estos productos." });
       }
     } else if (producto === "Tarjeta de Credito") {
-      // Asignar un valor predeterminado si es "Tarjeta de Crédito"
-      tasaFinal = 0; // Asignamos 0 como valor predeterminado para tasa
+      
+      tasaFinal = 0; 
     }
 
     const result = await pool.query(
