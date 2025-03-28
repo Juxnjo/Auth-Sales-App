@@ -87,7 +87,7 @@ const Sell = () => {
           </div>
 
           {/* Mostrar campo franquicia solo si el producto es "Tarjeta de Crédito" */}
-          {formData.producto === "Tarjeta de Crdito" && (
+          {formData.producto === "Tarjeta de Credito" && (
             <div>
               <label className="block text-sm font-semibold">Franquicia</label>
               <select
