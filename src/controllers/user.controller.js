@@ -64,18 +64,25 @@ class UserController {
     async deleteUser(req, res) {
         try {
             const { id } = req.params;
+    
+            // Verificar si el usuario tiene ventas
+            const tieneVentas = await UserModel.hasSales(id);
+            if (tieneVentas) {
+                return res.status(400).json({ message: "No se puede eliminar el usuario porque tiene ventas registradas." });
+            }
+    
             const success = await UserModel.deleteUser(id);
-
             if (!success) {
                 return res.status(404).json({ message: "Usuario no encontrado" });
             }
-
+    
             res.json({ message: "Usuario eliminado correctamente" });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: error.message });
         }
     }
+    
 }
 
 export default new UserController();

@@ -74,6 +74,14 @@ class UserModel {
             throw new Error("Error al eliminar usuario");
         }
     }
+
+    static async hasSales(userId) {
+        const query = `SELECT COUNT(*) AS total FROM ventas WHERE usuario_creacion = $1`;
+        const { rows } = await pool.query(query, [userId]);
+        return rows[0].total > 0; // Retorna true si tiene ventas, false si no
+      }
+    
 }
+
 
 export default UserModel;

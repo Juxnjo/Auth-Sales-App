@@ -17,6 +17,7 @@ const Navbar = () => {
         )}
         <Link to="/sell" className="hover:text-gray-300 transition">Radicar Venta</Link>
         <Link to="/sales" className="hover:text-gray-300 transition">Ventas</Link>
+        <Link to="/dashboard" className="hover:text-gray-300 transition">Dashboard</Link>
         <button 
           onClick={logout} 
           className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition"

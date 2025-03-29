@@ -29,3 +29,4 @@ export const updateSale = async (id, updatedData, token) => {
     throw new Error(error.response?.data || error.message);
   }
 };
+
