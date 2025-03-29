@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+import { fetchSales, deleteSale, updateSale } from "../services/salesService";
 
 const Sales = () => {
   const { token } = useContext(AuthContext);
@@ -16,7 +14,7 @@ const Sales = () => {
     producto: "",
     cupo_solicitado: "",
     franquicia: "",
-    tasa: "", // Tasa agregada al estado del formulario
+    tasa: "",
   });
 
   useEffect(() => {
@@ -25,40 +23,31 @@ const Sales = () => {
       navigate("/login");
       return;
     }
-    fetchSales();
+    fetchSalesData();
   }, [token, navigate]);
 
-  const fetchSales = async () => {
+  const fetchSalesData = async () => {
     try {
-      const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(`${API_URL}/sales`, { headers });
-      setSales(response.data);
+      const salesData = await fetchSales(token);
+      setSales(salesData);
 
-      const total = response.data.reduce(
+      const total = salesData.reduce(
         (sum, sale) => sum + parseFloat(sale.cupo_solicitado),
         0
       );
       setTotalCupo(total);
     } catch (error) {
-      console.error(
-        "Error al obtener ventas",
-        error.response?.data || error.message
-      );
+      console.error("Error al obtener ventas", error.message);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar esta venta?")) return;
     try {
-      await axios.delete(`${API_URL}/sales/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchSales();
+      await deleteSale(id, token);
+      fetchSalesData();
     } catch (error) {
-      console.error(
-        "Error al eliminar venta",
-        error.response?.data || error.message
-      );
+      console.error("Error al eliminar venta", error.message);
     }
   };
 
@@ -74,7 +63,7 @@ const Sales = () => {
       producto: sale.producto,
       cupo_solicitado: sale.cupo_solicitado,
       franquicia: sale.franquicia || "",
-      tasa: sale.tasa || "", // Asegúrate de pasar la tasa si existe
+      tasa: sale.tasa || "",
     });
   };
 
@@ -83,38 +72,32 @@ const Sales = () => {
   };
 
   const handleUpdate = async () => {
-    // Validación de tasa si el producto es "Credito de Consumo" o "Libranza Libre Inversión"
     if (
-      (formData.producto === "Credito de Consumo" || formData.producto === "Libranza Libre Inversión") &&
+      (formData.producto === "Credito de Consumo" ||
+        formData.producto === "Libranza Libre Inversión") &&
       !/^\d{2}(\.\d{2})?$/.test(formData.tasa)
     ) {
       alert("La tasa debe ser en formato XX.XX (2 números y 2 decimales)");
       return;
     }
-  
-    // Si el producto es "Tarjeta de Crédito", asignamos un valor predeterminado para tasa
+
     const updatedData = { ...formData };
     if (updatedData.producto === "Tarjeta de Crédito") {
       updatedData.tasa = 0; // Usamos 0 como valor predeterminado
     }
-  
+
     try {
-      await axios.put(`${API_URL}/sales/${selectedSale.id}`, updatedData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchSales();
+      await updateSale(selectedSale.id, updatedData, token);
+      fetchSalesData();
       setSelectedSale(null);
     } catch (error) {
-      console.error("Error al actualizar venta", error.response?.data || error.message);
+      console.error("Error al actualizar venta", error.message);
     }
   };
-  
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
-        📌 Listado de Ventas
-      </h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">📌 Listado de Ventas</h2>
 
       <div className="bg-blue-100 text-blue-800 p-4 rounded-lg mb-6 shadow-md flex justify-between">
         <p className="text-lg font-semibold">Total Cupo Solicitado:</p>
@@ -172,7 +155,6 @@ const Sales = () => {
         </table>
       </div>
 
-      {/* Modal Mejorado */}
       {selectedSale && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
@@ -182,6 +164,7 @@ const Sales = () => {
 
             {isEditing ? (
               <>
+                {/* Producto */}
                 <input
                   type="text"
                   name="producto"
@@ -190,6 +173,8 @@ const Sales = () => {
                   placeholder="Producto"
                   className="w-full p-2 my-2 border rounded"
                 />
+
+                {/* Cupo Solicitado */}
                 <input
                   type="number"
                   name="cupo_solicitado"
@@ -199,21 +184,24 @@ const Sales = () => {
                   className="w-full p-2 my-2 border rounded"
                 />
 
-                {/* Menú desplegable para seleccionar franquicia */}
-                <select
-                  name="franquicia"
-                  value={formData.franquicia}
-                  onChange={handleChange}
-                  className="w-full p-2 my-2 border rounded"
-                >
-                  <option value="">Selecciona una franquicia</option>
-                  <option value="VISA">VISA</option>
-                  <option value="MASTERCARD">MASTERCARD</option>
-                  <option value="AMEX">AMEX</option>
-                </select>
+                {/* Mostrar campo franquicia solo si el producto es "Tarjeta de Crédito" */}
+                {formData.producto === "Tarjeta de Credito" && (
+                  <select
+                    name="franquicia"
+                    value={formData.franquicia}
+                    onChange={handleChange}
+                    className="w-full p-2 my-2 border rounded"
+                  >
+                    <option value="">Selecciona una franquicia</option>
+                    <option value="VISA">VISA</option>
+                    <option value="MASTERCARD">MASTERCARD</option>
+                    <option value="AMEX">AMEX</option>
+                  </select>
+                )}
 
-                {/* Mostrar el campo tasa solo si el producto es Crédito de Consumo o Libranza Libre Inversión */}
-                {(formData.producto === "Credito de Consumo" || formData.producto === "Libranza Libre Inversión") && (
+                {/* Mostrar campo tasa solo si el producto es Crédito de Consumo o Libranza Libre Inversión */}
+                {(formData.producto === "Credito de Consumo" ||
+                  formData.producto === "Libranza Libre Inversión") && (
                   <input
                     type="text"
                     name="tasa"
@@ -239,7 +227,7 @@ const Sales = () => {
                   <strong>Producto:</strong> {selectedSale.producto}
                 </p>
                 <p>
-                  <strong>Cupo Solicitado:</strong> $
+                  <strong>Cupo Solicitado:</strong> ${" "}
                   {selectedSale.cupo_solicitado.toLocaleString()}
                 </p>
                 <p>

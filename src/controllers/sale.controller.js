@@ -100,20 +100,25 @@ export const updateSale = async (req, res) => {
           .json({ message: "La tasa es obligatoria para estos productos." });
       }
     } else if (producto === "Tarjeta de Credito") {
-      
-      tasaFinal = 0; 
+      tasaFinal = 0;
+    }
+
+    // Asegúrate de que franquicia sea null cuando no sea necesario
+    let franquiciaFinal = franquicia;
+    if (producto !== "Tarjeta de Credito") {
+      franquiciaFinal = null;
     }
 
     const result = await pool.query(
       `
-            UPDATE ventas SET producto = $1, cupo_solicitado = $2, franquicia = $3, tasa = $4, 
-                              usuario_actualizacion = $5, fecha_actualizacion = NOW()
-            WHERE id = $6 RETURNING *
-        `,
+        UPDATE ventas SET producto = $1, cupo_solicitado = $2, franquicia = $3, tasa = $4, 
+                          usuario_actualizacion = $5, fecha_actualizacion = NOW()
+        WHERE id = $6 RETURNING *
+      `,
       [
         producto,
         cupo_solicitado,
-        franquicia,
+        franquiciaFinal,
         tasaFinal,
         usuario_actualizacion,
         id,
@@ -129,6 +134,7 @@ export const updateSale = async (req, res) => {
     res.status(500).json({ message: "Error al actualizar venta" });
   }
 };
+
 
 export const deleteSale = async (req, res) => {
   try {
