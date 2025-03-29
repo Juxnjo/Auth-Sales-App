@@ -30,3 +30,15 @@ export const updateSale = async (id, updatedData, token) => {
   }
 };
 
+export const updateSaleStatus = async (saleId, newStatus, token) => {
+  try {
+    const headers = { Authorization: `Bearer ${token}` };
+    await axios.put(
+      `${API_URL}/sales/${saleId}/status`,
+      { estado: newStatus },
+      { headers }
+    );
+  } catch (error) {
+    throw new Error(error.response?.data || error.message);
+  }
+};

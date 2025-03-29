@@ -8,5 +8,6 @@ router.get("/", verifyToken, SaleController.getSales);
 router.post("/", verifyToken, SaleController.createSale);
 router.put("/:id", verifyToken, isAdminOrAdvisor, SaleController.updateSale);
 router.delete("/:id", verifyToken, isAdminOrAdvisor, SaleController.deleteSale);
+router.put("/:id/status", verifyToken, SaleController.updateSaleStatus);
 
 export default router;

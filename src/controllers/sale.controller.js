@@ -67,6 +67,33 @@ class SaleController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async updateSaleStatus(req, res) {
+        try {
+            const { id } = req.params; // ID de la venta a actualizar
+            const { estado } = req.body; // Nuevo estado
+            const { id: usuario_actualizacion } = req.user; // Usuario que modifica
+    
+            // Validar que el estado sea válido
+            const estadosValidos = ["Abierto", "En Proceso", "Finalizado"];
+            if (!estadosValidos.includes(estado)) {
+                return res.status(400).json({ message: "Estado no válido" });
+            }
+    
+            // Llamar al modelo para actualizar la venta
+            const updatedSale = await SaleModel.updateSaleStatus(id, estado, usuario_actualizacion);
+    
+            if (!updatedSale) {
+                return res.status(404).json({ message: "Venta no encontrada" });
+            }
+    
+            res.json({ message: "Estado actualizado correctamente", updatedSale });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: error.message });
+        }
+    }
+    
 }
 
 export default new SaleController();

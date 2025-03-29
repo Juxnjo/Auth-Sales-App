@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { fetchSales, deleteSale, updateSale } from "../services/salesService";
+import { fetchSales, deleteSale, updateSale, updateSaleStatus } from "../services/salesService";
 
 const Sales = () => {
   const { token } = useContext(AuthContext);
@@ -95,9 +95,31 @@ const Sales = () => {
     }
   };
 
+  const handleStatusChange = async (saleId, newStatus) => {
+    if (!window.confirm(`¿Estás seguro de cambiar el estado a "${newStatus}"?`))
+      return;
+  
+    try {
+      const updatedSale = await updateSaleStatus(saleId, newStatus, token);
+  
+      // Actualizar la lista de ventas en el estado sin recargar todo
+      setSales((prevSales) =>
+        prevSales.map((sale) =>
+          sale.id === saleId ? { ...sale, estado: newStatus } : sale
+        )
+      );
+  
+    } catch (error) {
+      console.error("Error al cambiar el estado de la venta:", error.message);
+    }
+  };
+  
+
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">📌 Listado de Ventas</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        📌 Listado de Ventas
+      </h2>
 
       <div className="bg-blue-100 text-blue-800 p-4 rounded-lg mb-6 shadow-md flex justify-between">
         <p className="text-lg font-semibold">Total Cupo Solicitado:</p>
@@ -113,13 +135,16 @@ const Sales = () => {
               <th className="p-3 text-left">Fecha de Creación</th>
               <th className="p-3 text-left">Usuario</th>
               <th className="p-3 text-center">Acciones</th>
+              <th className="p-3 text-center">Estado</th>
             </tr>
           </thead>
           <tbody>
             {sales.map((sale, index) => (
               <tr
                 key={sale.id}
-                className={`border-b ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
+                className={`border-b ${
+                  index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                }`}
               >
                 <td className="p-3">{sale.producto}</td>
                 <td className="p-3 font-semibold text-green-600">
@@ -148,7 +173,21 @@ const Sales = () => {
                   >
                     🗑️
                   </button>
+                 
                 </td>
+                <td className="p-3 text-center ">
+                    <select
+                      value={sale.estado}
+                      onChange={(e) =>
+                        handleStatusChange(sale.id, e.target.value)
+                      }
+                      className="border p-2 rounded bg-gray-100"
+                    >
+                      <option value="Abierto">Abierto</option>
+                      <option value="En Proceso">En Proceso</option>
+                      <option value="Finalizado">Finalizado</option>
+                    </select>
+                  </td>
               </tr>
             ))}
           </tbody>
